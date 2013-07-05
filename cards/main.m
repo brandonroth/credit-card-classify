@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "Node.h"
+#import "CardValidator.h"
 
 int main(int argc, const char * argv[])
 {
@@ -15,20 +15,23 @@ int main(int argc, const char * argv[])
     @autoreleasepool {
 
     
-        Node *head = [Node headNode];
-        [head addCardPrefix:@"4" forCardType:@"Visa"];
-        [head addCardPrefix:@"35" forCardType:@"Amex"];
-        [head addCardPrefix:@"37" forCardType:@"Amex"];
-        [head addCardPrefix:@"3528" forCardType:@"JCB"];
+        CardValidator *validator = [[CardValidator alloc] init];
+        [validator addCardPrefix:@"4" forCardType:@"Visa"];
+        [validator addCardPrefix:@"35" forCardType:@"Amex"];
+        [validator addCardPrefix:@"37" forCardType:@"Amex"];
+        [validator addCardPrefix:@"3528" forCardType:@"JCB"];
 
         NSMutableArray *card = [[NSMutableArray alloc] init];
         [card addObject:@"3"];
         [card addObject:@"5"];
         [card addObject:@"2"];
+
+        NSString *cardNumber = @"3";
         
-        NSSet * set = [head possibleCardsForCardNumber:card];
+        NSSet * set = [validator possibleCardsForCardNumber:cardNumber];
 
         NSLog(@"%@",set);
+
     }
     return 0;
 }

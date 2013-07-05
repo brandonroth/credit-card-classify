@@ -10,7 +10,7 @@
 		CAA8E7211786352D003CBFA4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CAA8E7201786352D003CBFA4 /* Foundation.framework */; };
 		CAA8E7241786352D003CBFA4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CAA8E7231786352D003CBFA4 /* main.m */; };
 		CAA8E7281786352D003CBFA4 /* cards.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = CAA8E7271786352D003CBFA4 /* cards.1 */; };
-		CAA8E73017863692003CBFA4 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = CAA8E72F17863692003CBFA4 /* Node.m */; };
+		CAA8E73017863692003CBFA4 /* CardValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = CAA8E72F17863692003CBFA4 /* CardValidator.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -32,8 +32,8 @@
 		CAA8E7231786352D003CBFA4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		CAA8E7261786352D003CBFA4 /* cards-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "cards-Prefix.pch"; sourceTree = "<group>"; };
 		CAA8E7271786352D003CBFA4 /* cards.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = cards.1; sourceTree = "<group>"; };
-		CAA8E72E17863692003CBFA4 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Node.h; sourceTree = "<group>"; };
-		CAA8E72F17863692003CBFA4 /* Node.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Node.m; sourceTree = "<group>"; };
+		CAA8E72E17863692003CBFA4 /* CardValidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CardValidator.h; sourceTree = "<group>"; };
+		CAA8E72F17863692003CBFA4 /* CardValidator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CardValidator.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,8 +79,8 @@
 				CAA8E7231786352D003CBFA4 /* main.m */,
 				CAA8E7271786352D003CBFA4 /* cards.1 */,
 				CAA8E7251786352D003CBFA4 /* Supporting Files */,
-				CAA8E72E17863692003CBFA4 /* Node.h */,
-				CAA8E72F17863692003CBFA4 /* Node.m */,
+				CAA8E72E17863692003CBFA4 /* CardValidator.h */,
+				CAA8E72F17863692003CBFA4 /* CardValidator.m */,
 			);
 			path = cards;
 			sourceTree = "<group>";
@@ -145,7 +145,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CAA8E7241786352D003CBFA4 /* main.m in Sources */,
-				CAA8E73017863692003CBFA4 /* Node.m in Sources */,
+				CAA8E73017863692003CBFA4 /* CardValidator.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
