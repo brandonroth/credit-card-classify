@@ -7,6 +7,9 @@
 
 #import "CardValidator.h"
 
+NSString * const kCardTypeAmbiguous = @"AmbiguousCardNumber";
+NSString * const kCardTypeInvalid = @"InvalidCardNumber";
+
 @interface Node : NSObject
 
 @property (strong, nonatomic) NSString *value;
@@ -37,10 +40,39 @@
     return validator;
 }
 
++(BOOL)isCardNumberValid:(NSArray*)cardNumber
+{
+    __block int sum = 0;
+    [cardNumber enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        int value = [((NSString*)obj) intValue];
+
+        //even though we reverse enumerate the indexes are still correct as if we had enumerated normally.
+        //subtraction changes our perspective and also has the effect of one basing the array so position 2
+        //is now one of the 'every other' cases
+        if ((cardNumber.count - idx) % 2 == 0)
+        {
+            int doubledValue = value << 1; //shifting is far faster than multiplication
+
+            //if the number is greater than 9 and we modula and divide by 10 we get each component
+            //if it's 9 or less then we will get the number and zero (respectfully).
+            sum += (doubledValue / 10) + (doubledValue % 10);
+        }
+        else
+        {
+            sum += value;
+        }
+    }];
+    return ((sum % 10) == 0);
+}
+
 -(CardValidator*)init
 {
-    self.head = [[Node alloc] init];
-    self.knownCards = [[NSMutableSet alloc] init];
+
+    if (self = [super init])
+    {
+        self.head = [[Node alloc] init];
+        self.knownCards = [[NSMutableSet alloc] init];
+    }
     return self;
 }
 
@@ -55,8 +87,25 @@
                                    options:NSStringEnumerationByComposedCharacterSequences usingBlock:^(NSString *substring, NSRange substringRange, NSRange enclosingRange, BOOL *stop) {
                                        [cardNumberAsArray addObject:substring];
                                    }];
-    
+
     return [self.head possibleCardsForCardNumber:cardNumberAsArray];
+}
+
+-(NSString *)clasifyCardType:(NSString*)cardNumber
+{
+    NSSet *possibleCards = [self possibleCardsForCardNumber:cardNumber];
+    if (possibleCards.count == 1)
+    {
+        return possibleCards.anyObject;
+    }
+    else if (possibleCards.count > 1)
+    {
+        return kCardTypeAmbiguous;
+    }
+    else
+    {
+        return kCardTypeInvalid;
+    }
 }
 
 -(void)addCardPrefix:(NSString *)prefix forCardType:(NSString *)cardType
@@ -70,7 +119,34 @@
 
 -(void)addCardPrefixesFromDictionary:(NSDictionary *)dictionary
 {
+    [dictionary enumerateKeysAndObjectsUsingBlock:^(NSString* key, NSArray* obj, BOOL *stop) {
+        if( [key isKindOfClass:[NSString class]] && [obj isKindOfClass:[NSArray class]] )
+        {
+            for (NSString *prefix in obj)
+            {
+                //need to see if this is a range
+                NSArray *seperatedComponents = [prefix componentsSeparatedByString:@"-"];
+                if (seperatedComponents.count > 1)
+                {
+                    [self addCardPrefixWithStartRange:[seperatedComponents[0] integerValue] end:[seperatedComponents[1] integerValue] forCardType:key];
+                }
+                else
+                {
+                    [self addCardPrefix:prefix forCardType:key];
+                }
+            }
+        }
+    }];
 
+}
+
+-(void)addCardPrefixWithStartRange:(NSUInteger)start end:(NSUInteger)end forCardType:(NSString*)cardType
+{
+    for (NSUInteger i = start; i <= end; i+=1)
+    {
+        NSString *numberInRange = [NSString stringWithFormat:@"%li",(unsigned long)i];
+        [self addCardPrefix:numberInRange forCardType:cardType];
+    }
 }
 
 -(NSSet*)listOfKnownCards
@@ -84,16 +160,22 @@
 
 -(Node*)init
 {
-    self.possibleCards = [[NSMutableSet alloc] init];
-    self.children = [[NSMutableDictionary alloc] init];
+    if (self = [super init])
+    {
+        self.possibleCards = [[NSMutableSet alloc] init];
+        self.children = [[NSMutableDictionary alloc] init];
+    }
     return self;
 }
 
 -(Node*)initWithStringValue:(NSString*)inValue
 {
-    self.value = inValue;
-    self.possibleCards = [[NSMutableSet alloc] init];
-    self.children = [[NSMutableDictionary alloc] init];
+    if (self = [super init])
+    {
+        self.value = inValue;
+        self.possibleCards = [[NSMutableSet alloc] init];
+        self.children = [[NSMutableDictionary alloc] init];
+    }
     return self;
 }
 
@@ -127,23 +209,30 @@
     //self should be the head otherwise the tree won't be built correctly.
     //this is enforced by keeping the Node class an internal data structure.
     __block Node *node = self;
-    
+
     [prefix enumerateSubstringsInRange:range options:NSStringEnumerationByComposedCharacterSequences usingBlock:^(NSString *substring, NSRange substringRange, NSRange enclosingRange, BOOL *stop) {
         node = [node addChildWithValue:substring cardType:cardType];
     }];
 }
 
 /*
-The method searches the tree for a card number match
-If it is able to positively match a card number it will return a set with 1 string element which is the name of the card
-If it unable to identify a card becasue it doesn't have enough information it will return a set will possible matches
-If it is unable to identy a card because the prefix doesn't exist it will return and empty set;
-*/
+ The method searches the tree for a card number match
+ If it is able to positively match a card number it will return a set with 1 string element which is the name of the card
+ If it unable to identify a card becasue it doesn't have enough information it will return a set will possible matches
+ If it is unable to identy a card because the prefix doesn't exist it will return nil;
+ */
 -(NSSet*)possibleCardsForCardNumber:(NSMutableArray*)cardNumber
 {
     //if we run out of card digits then the node we landed on will know which
     //cards it's path is associated with
     if (cardNumber.count == 0)
+    {
+        return self.possibleCards;
+    }
+
+    //if there are no more children then this is a leaf node and we can return
+    //what it knows about it's possible cards
+    if (self.children.count == 0)
     {
         return self.possibleCards;
     }
