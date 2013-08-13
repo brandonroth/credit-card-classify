@@ -39,11 +39,6 @@ int main(int argc, const char * argv[])
 
         [validator addCardPrefixesFromDictionary:cards];
 
-        NSMutableArray *card = [[NSMutableArray alloc] init];
-        [card addObject:@"3"];
-        [card addObject:@"5"];
-        [card addObject:@"2"];
-
         NSString *cardNumber = @"359010";
         
         NSSet * set = [validator possibleCardsForCardNumber:cardNumber];
